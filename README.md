@@ -1,34 +1,34 @@
-# سجل الحضور والانصراف
+# Attendance Tracker
 
-هل تبحث عن طريقة بسيطة لتسجيل حضورك وانصرافك من الهاتف؟ 👋
+Looking for a simple way to record your check-in and check-out times from your phone? 👋
 
-**سجل الحضور والانصراف** صفحة عربية سهلة الاستخدام تساعدك على متابعة دوامك الأسبوعي، بدون كتابة الوقت يدويًا. افتح الصفحة، واضغط على تسجيل الحضور أو الانصراف، وسيظهر الوقت تلقائيًا بعد تأكيدك.
+**Attendance Tracker** is an easy-to-use Arabic page that helps you keep track of your weekly work schedule without entering times manually. Open the page, tap **Check In** or **Check Out**, and the current time will appear after you confirm.
 
-## جرّب الصفحة
+## Try the page
 
-👉 **[افتح سجل الحضور والانصراف](https://mahmoudalmorsi.github.io/attendance-tracker/)**
+👉 [**Open Attendance Tracker**](https://mahmoudalmorsi.github.io/attendance-tracker/)
 
-## ماذا يقدم المشروع؟
+## What does the project offer?
 
-- تصميم عربي مناسب لشاشات الهاتف.
-- تسجيل الحضور والانصراف لأيام العمل من السبت إلى الخميس.
-- تأكيد قبل حفظ الوقت لتجنب الضغط بالخطأ.
-- إمكانية تصحيح الوقت المسجل.
-- عرض الأسابيع السابقة والتالية ومراجعة السجلات.
+- An Arabic interface designed for mobile screens.
+- Check-in and check-out tracking for workdays from Saturday through Thursday.
+- A confirmation step to prevent accidental entries.
+- The ability to correct a recorded time.
+- The option to browse previous and upcoming weeks and review your records.
 
-## طريقة الاستخدام
+## How to use it
 
-1. افتح رابط الصفحة من هاتفك.
-2. عند الحضور أو الانصراف، اضغط على الخانة المناسبة.
-3. أكّد التسجيل؛ سيُحفظ الوقت تلقائيًا.
-4. إذا احتجت تعديل وقت، اختر **«تصحيح الوقت»**.
+1. Open the page on your phone.
+2. When you arrive or leave, tap the appropriate field.
+3. Confirm the entry; the time will be saved automatically.
+4. To change a recorded time, select **“Correct Time.”**
 
-## ملاحظة عن الخصوصية
+## Privacy note
 
-يُحفظ السجل في المتصفح على الجهاز الذي تستخدمه. لا تتم مزامنته تلقائيًا مع أجهزتك الأخرى، وقد تفقد السجلات إذا حذفت بيانات المتصفح.
+Your records are saved in the browser on the device you use. They are not automatically synced across your devices, and you may lose them if you clear your browser data.
 
-## التقنيات
+## Technologies
 
-HTML وCSS وJavaScript، دون الحاجة إلى تثبيت تطبيق.
+HTML, CSS, and JavaScript—no app installation required.
 
-**جرّب الصفحة وشاركها مع من قد يستفيد منها!**
+**Try the page and share it with anyone who might find it useful!**
