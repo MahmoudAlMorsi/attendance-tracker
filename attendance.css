@@ -1,0 +1,388 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap");
+
+:root {
+  color-scheme: light;
+  font-family: "Cairo", Tahoma, sans-serif;
+  color: #172b4d;
+  background: #f4f7fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  padding: 28px 16px 48px;
+}
+
+button {
+  font: inherit;
+}
+
+.page {
+  width: min(100%, 560px);
+  margin: 0 auto;
+}
+
+.page-header {
+  padding: 26px 20px 24px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 24px;
+  box-shadow: 0 12px 35px rgb(26 55 95 / 6%);
+}
+
+.brand-mark {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 12px;
+  place-items: center;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+  background: #247b62;
+  border-radius: 17px;
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  color: #718198;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+h1 {
+  margin: 0;
+  color: #172b4d;
+  font-size: clamp(24px, 7vw, 30px);
+  font-weight: 800;
+}
+
+.intro {
+  margin: 7px 0 17px;
+  color: #718198;
+  font-size: 13px;
+}
+
+.work-hours {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 12px;
+  color: #356c5a;
+  font-size: 12px;
+  background: #eff8f4;
+  border-radius: 12px;
+}
+
+.work-hours strong {
+  font-weight: 700;
+}
+
+.clock-icon {
+  font-size: 17px;
+}
+
+.attendance-section {
+  margin-top: 21px;
+  padding: 20px 16px 15px;
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 24px;
+  box-shadow: 0 12px 35px rgb(26 55 95 / 6%);
+}
+
+.week-navigation {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.week-heading {
+  text-align: center;
+}
+
+.week-heading h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.week-heading p {
+  margin: 1px 0 0;
+  color: #8693a6;
+  font-size: 11px;
+}
+
+.nav-button {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: #52647e;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  background: #f4f7fb;
+  border: 0;
+  border-radius: 12px;
+}
+
+.nav-button:hover {
+  color: #247b62;
+  background: #eff8f4;
+}
+
+.days-list {
+  display: grid;
+  gap: 10px;
+}
+
+.day-card {
+  display: grid;
+  grid-template-columns: minmax(74px, 0.75fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border: 1px solid #edf0f5;
+  border-radius: 16px;
+}
+
+.day-card.is-today {
+  border-color: #b7dece;
+  background: #fbfefc;
+}
+
+.day-info {
+  min-width: 0;
+}
+
+.day-info h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.day-info p {
+  margin: 2px 0 0;
+  color: #8693a6;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.today-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 1px 7px;
+  color: #247b62;
+  font-size: 10px;
+  font-weight: 700;
+  background: #e7f5ee;
+  border-radius: 20px;
+}
+
+.day-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.action-container {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.record-action {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 7px;
+  color: #41526b;
+  text-align: right;
+  cursor: pointer;
+  background: #f6f8fb;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.record-action:not(:disabled):hover {
+  background: #eff8f4;
+  border-color: #cce8da;
+}
+
+.record-action:disabled {
+  cursor: default;
+}
+
+.correction-button {
+  width: 100%;
+  padding: 2px 4px;
+  color: #64758c;
+  font-size: 9px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+}
+
+.correction-button:not(:disabled):hover {
+  color: #247b62;
+  background: #eff8f4;
+}
+
+.correction-button:disabled {
+  cursor: default;
+}
+
+.correction-editor {
+  display: grid;
+  gap: 5px;
+  padding-top: 3px;
+}
+
+.correction-input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 6px;
+  color: #41526b;
+  font: inherit;
+  font-size: 11px;
+  background: #fff;
+  border: 1px solid #dce4ee;
+  border-radius: 7px;
+}
+
+.correction-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.correction-save,
+.correction-cancel {
+  padding: 3px 4px;
+  font-size: 9px;
+  cursor: pointer;
+  border: 0;
+  border-radius: 6px;
+}
+
+.correction-save {
+  color: #fff;
+  background: #247b62;
+}
+
+.correction-cancel {
+  color: #64758c;
+  background: #f0f3f7;
+}
+
+.record-action.is-recorded {
+  color: #247b62;
+  background: #eff8f4;
+}
+
+.checkbox-mark {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  place-items: center;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  background: #fff;
+  border: 1.5px solid #c9d2df;
+  border-radius: 6px;
+}
+
+.is-recorded .checkbox-mark {
+  background: #247b62;
+  border-color: #247b62;
+}
+
+.action-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.action-title {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.action-time {
+  overflow: hidden;
+  color: #8491a4;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.is-recorded .action-time {
+  color: #356c5a;
+  font-weight: 600;
+}
+
+.privacy-note {
+  margin: 15px 0 0;
+  color: #8a97a9;
+  font-size: 10px;
+  text-align: center;
+}
+
+.storage-notice {
+  margin: 0 0 13px;
+  padding: 10px 12px;
+  color: #8b3838;
+  font-size: 12px;
+  background: #fff1f0;
+  border-radius: 10px;
+}
+
+@media (max-width: 380px) {
+  body {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .attendance-section {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .day-card {
+    grid-template-columns: 66px minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 7px;
+  }
+
+  .day-actions {
+    gap: 5px;
+  }
+
+  .record-action {
+    gap: 4px;
+    padding: 7px 5px;
+  }
+}

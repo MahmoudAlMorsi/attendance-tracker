@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f7fb" />
+    <title>سجل الحضور والانصراف</title>
+    <link rel="stylesheet" href="attendance.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <div class="brand-mark" aria-hidden="true">✓</div>
+        <p class="eyebrow">سجل العمل الأسبوعي</p>
+        <h1>الحضور والانصراف</h1>
+        <p class="intro">اضغط على الخانة، وسنسجل الوقت تلقائيًا من هاتفك.</p>
+        <div class="work-hours">
+          <span class="clock-icon" aria-hidden="true">◷</span>
+          مواعيد العمل
+          <strong>٧:٠٠ صباحًا – ٧:٠٠ مساءً</strong>
+        </div>
+      </header>
+
+      <section class="attendance-section" aria-labelledby="week-title">
+        <div class="week-navigation">
+          <button class="nav-button" id="previous-week" type="button" aria-label="الأسبوع السابق">
+            <span aria-hidden="true">›</span>
+          </button>
+          <div class="week-heading">
+            <h2 id="week-title">هذا الأسبوع</h2>
+            <p id="week-range"></p>
+          </div>
+          <button class="nav-button" id="next-week" type="button" aria-label="الأسبوع التالي">
+            <span aria-hidden="true">‹</span>
+          </button>
+        </div>
+
+        <p class="storage-notice" id="storage-notice" role="status" hidden></p>
+        <div class="days-list" id="days-list"></div>
+        <p class="privacy-note">
+          <span aria-hidden="true">🔒</span>
+          سجلاتك محفوظة على هذا الهاتف فقط.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const STORAGE_KEY = "work-attendance-records-v1";
+      const workDays = [
+        { name: "السبت", shortDate: "سبت" },
+        { name: "الأحد", shortDate: "أحد" },
+        { name: "الاثنين", shortDate: "اثن" },
+        { name: "الثلاثاء", shortDate: "ثلا" },
+        { name: "الأربعاء", shortDate: "أرب" },
+        { name: "الخميس", shortDate: "خمي" },
+      ];
+      const dateFormatter = new Intl.DateTimeFormat("ar-EG", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      const timeFormatter = new Intl.DateTimeFormat("ar-EG", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+      const daysList = document.querySelector("#days-list");
+      const weekRange = document.querySelector("#week-range");
+      const weekTitle = document.querySelector("#week-title");
+      const storageNotice = document.querySelector("#storage-notice");
+      let weekStart = getWeekStart(new Date());
+      let records = {};
+      let storageAvailable = true;
+
+      function getDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function getWeekStart(date) {
+        const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        start.setDate(start.getDate() - ((start.getDay() + 1) % 7));
+        return start;
+      }
+
+      function showStorageError(message) {
+        storageNotice.textContent = message;
+        storageNotice.hidden = false;
+        storageAvailable = false;
+      }
+
+      function loadRecords() {
+        try {
+          const savedRecords = localStorage.getItem(STORAGE_KEY);
+          records = savedRecords ? JSON.parse(savedRecords) : {};
+          if (!records || typeof records !== "object" || Array.isArray(records)) {
+            throw new Error("Invalid attendance data");
+          }
+        } catch (error) {
+          showStorageError("تعذر تحميل السجلات المحفوظة. لن تتمكن من تسجيل بيانات جديدة على هذا الجهاز.");
+        }
+      }
+
+      function getStoredTime(value) {
+        if (typeof value !== "string") return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function makeCorrectionEditor(dateKey, type, label, savedTime, onCancel) {
+        const editor = document.createElement("div");
+        editor.className = "correction-editor";
+
+        const input = document.createElement("input");
+        input.className = "correction-input";
+        input.type = "time";
+        input.required = true;
+        input.value = `${String(savedTime.getHours()).padStart(2, "0")}:${String(
+          savedTime.getMinutes(),
+        ).padStart(2, "0")}`;
+        input.setAttribute("aria-label", `الوقت الصحيح لـ ${label}`);
+
+        const buttons = document.createElement("div");
+        buttons.className = "correction-controls";
+        const saveButton = document.createElement("button");
+        saveButton.className = "correction-save";
+        saveButton.type = "button";
+        saveButton.textContent = "حفظ";
+        const cancelButton = document.createElement("button");
+        cancelButton.className = "correction-cancel";
+        cancelButton.type = "button";
+        cancelButton.textContent = "إلغاء";
+
+        cancelButton.addEventListener("click", () => {
+          editor.remove();
+          onCancel();
+        });
+        saveButton.addEventListener("click", () => {
+          if (!input.reportValidity()) return;
+          const correctedDate = new Date(`${dateKey}T${input.value}:00`);
+          const dayRecord = { ...(records[dateKey] || {}), [type]: correctedDate.toISOString() };
+          saveRecord(dateKey, dayRecord);
+        });
+
+        buttons.append(saveButton, cancelButton);
+        editor.append(input, buttons);
+        return editor;
+      }
+
+      function makeAction(dateKey, type, label, value) {
+        const container = document.createElement("div");
+        container.className = "action-container";
+        const button = document.createElement("button");
+        const savedTime = getStoredTime(value);
+        button.className = `record-action${savedTime ? " is-recorded" : ""}`;
+        button.type = "button";
+        button.disabled = Boolean(savedTime) || !storageAvailable || dateKey !== getDateKey(new Date());
+        button.setAttribute("aria-label", savedTime
+          ? `${label} مسجل الساعة ${timeFormatter.format(savedTime)}`
+          : `تسجيل ${label}`);
+
+        const checkbox = document.createElement("span");
+        checkbox.className = "checkbox-mark";
+        checkbox.setAttribute("aria-hidden", "true");
+        checkbox.textContent = savedTime ? "✓" : "";
+
+        const copy = document.createElement("span");
+        copy.className = "action-copy";
+        const title = document.createElement("span");
+        title.className = "action-title";
+        title.textContent = label;
+        const time = document.createElement("span");
+        time.className = "action-time";
+        time.textContent = savedTime
+          ? timeFormatter.format(savedTime)
+          : dateKey === getDateKey(new Date())
+            ? "اضغط للتسجيل"
+            : "—";
+        copy.append(title, time);
+        button.append(checkbox, copy);
+        container.append(button);
+
+        if (savedTime) {
+          const correctionButton = document.createElement("button");
+          correctionButton.className = "correction-button";
+          correctionButton.type = "button";
+          correctionButton.disabled = !storageAvailable;
+          correctionButton.textContent = "تصحيح الوقت";
+          correctionButton.setAttribute("aria-label", `تصحيح وقت ${label}`);
+          correctionButton.addEventListener("click", () => {
+            correctionButton.disabled = true;
+            container.append(
+              makeCorrectionEditor(dateKey, type, label, savedTime, () => {
+                correctionButton.disabled = false;
+              }),
+            );
+          });
+          container.append(correctionButton);
+        }
+
+        button.addEventListener("click", () => recordTime(dateKey, type, label));
+        return container;
+      }
+
+      function saveRecord(dateKey, dayRecord) {
+        const updatedRecords = { ...records, [dateKey]: dayRecord };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRecords));
+          records = updatedRecords;
+          renderWeek();
+          return true;
+        } catch (error) {
+          showStorageError("تعذر حفظ السجل. تحقق من مساحة التخزين في المتصفح وحاول مرة أخرى.");
+          renderWeek();
+          return false;
+        }
+      }
+
+      function recordTime(dateKey, type, label) {
+        if (!storageAvailable || dateKey !== getDateKey(new Date())) return;
+        if (!window.confirm(`هل تريد تسجيل وقت ${label} الآن؟`)) return;
+        const dayRecord = { ...(records[dateKey] || {}) };
+        if (dayRecord[type]) return;
+
+        dayRecord[type] = new Date().toISOString();
+        saveRecord(dateKey, dayRecord);
+      }
+
+      function renderWeek() {
+        const todayKey = getDateKey(new Date());
+        const todayWeekStart = getWeekStart(new Date());
+        const isCurrentWeek = getDateKey(weekStart) === getDateKey(todayWeekStart);
+        weekTitle.textContent = isCurrentWeek ? "هذا الأسبوع" : "سجل الأسبوع";
+        weekRange.textContent = `${dateFormatter.format(weekStart)} – ${dateFormatter.format(
+          new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 5),
+        )}`;
+        daysList.replaceChildren();
+
+        workDays.forEach((day, index) => {
+          const date = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + index);
+          const dateKey = getDateKey(date);
+          const dayRecord = records[dateKey] || {};
+          const isToday = dateKey === todayKey;
+          const card = document.createElement("article");
+          card.className = `day-card${isToday ? " is-today" : ""}`;
+
+          const dayInfo = document.createElement("div");
+          dayInfo.className = "day-info";
+          const name = document.createElement("h3");
+          name.textContent = day.name;
+          const dateText = document.createElement("p");
+          dateText.textContent = dateFormatter.format(date);
+          dayInfo.append(name, dateText);
+          if (isToday) {
+            const todayBadge = document.createElement("span");
+            todayBadge.className = "today-badge";
+            todayBadge.textContent = "اليوم";
+            dayInfo.append(todayBadge);
+          }
+
+          const actions = document.createElement("div");
+          actions.className = "day-actions";
+          actions.append(
+            makeAction(dateKey, "checkIn", "الحضور", dayRecord.checkIn),
+            makeAction(dateKey, "checkOut", "الانصراف", dayRecord.checkOut),
+          );
+          card.append(dayInfo, actions);
+          daysList.append(card);
+        });
+      }
+
+      document.querySelector("#previous-week").addEventListener("click", () => {
+        weekStart.setDate(weekStart.getDate() - 7);
+        renderWeek();
+      });
+      document.querySelector("#next-week").addEventListener("click", () => {
+        weekStart.setDate(weekStart.getDate() + 7);
+        renderWeek();
+      });
+
+      loadRecords();
+      renderWeek();
+    </script>
+  </body>
+</html>
