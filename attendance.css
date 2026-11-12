@@ -198,6 +198,36 @@ h1 {
   gap: 7px;
 }
 
+.weekly-total {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 14px 12px;
+  text-align: center;
+  background: #eff8f4;
+  border: 1px solid #dcefe5;
+  border-radius: 15px;
+}
+
+.weekly-total-label {
+  color: #356c5a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.weekly-total-value {
+  color: #247b62;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.weekly-total-note {
+  color: #718198;
+  font-size: 10px;
+}
+
 .day-total {
   display: grid;
   min-width: 0;
