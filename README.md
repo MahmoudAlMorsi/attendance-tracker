@@ -14,6 +14,7 @@ Looking for a simple way to record your check-in and check-out times from your p
 - Check-in and check-out tracking for workdays from Saturday through Thursday.
 - A confirmation step to prevent accidental entries.
 - The ability to add or correct attendance times for previous workdays at any time.
+- Daily work duration calculated automatically from check-in and check-out times.
 - The option to browse previous and upcoming weeks and review your records.
 
 ## How to use it
