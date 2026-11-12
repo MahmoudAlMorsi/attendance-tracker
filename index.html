@@ -13,7 +13,7 @@
         <div class="brand-mark" aria-hidden="true">✓</div>
         <p class="eyebrow">سجل العمل الأسبوعي</p>
         <h1>الحضور والانصراف</h1>
-        <p class="intro">اضغط على الخانة، وسنسجل الوقت تلقائيًا من هاتفك.</p>
+        <p class="intro">سجّل وقتك اليوم، أو أضف وعدّل سجلات الأيام السابقة في أي وقت.</p>
         <div class="work-hours">
           <span class="clock-icon" aria-hidden="true">◷</span>
           مواعيد العمل
@@ -117,17 +117,19 @@
         input.className = "correction-input";
         input.type = "time";
         input.required = true;
-        input.value = `${String(savedTime.getHours()).padStart(2, "0")}:${String(
-          savedTime.getMinutes(),
-        ).padStart(2, "0")}`;
-        input.setAttribute("aria-label", `الوقت الصحيح لـ ${label}`);
+        input.value = savedTime
+          ? `${String(savedTime.getHours()).padStart(2, "0")}:${String(
+              savedTime.getMinutes(),
+            ).padStart(2, "0")}`
+          : "";
+        input.setAttribute("aria-label", `${savedTime ? "الوقت الصحيح" : "وقت"} ${label}`);
 
         const buttons = document.createElement("div");
         buttons.className = "correction-controls";
         const saveButton = document.createElement("button");
         saveButton.className = "correction-save";
         saveButton.type = "button";
-        saveButton.textContent = "حفظ";
+        saveButton.textContent = savedTime ? "حفظ التعديل" : "تسجيل الوقت";
         const cancelButton = document.createElement("button");
         cancelButton.className = "correction-cancel";
         cancelButton.type = "button";
@@ -139,6 +141,11 @@
         });
         saveButton.addEventListener("click", () => {
           if (!input.reportValidity()) return;
+          const date = new Date(`${dateKey}T00:00:00`);
+          const action = savedTime ? "تصحيح" : "تسجيل";
+          if (!window.confirm(`هل تريد ${action} وقت ${label} ليوم ${dateFormatter.format(date)}؟`)) {
+            return;
+          }
           const correctedDate = new Date(`${dateKey}T${input.value}:00`);
           const dayRecord = { ...(records[dateKey] || {}), [type]: correctedDate.toISOString() };
           saveRecord(dateKey, dayRecord);
@@ -154,12 +161,16 @@
         container.className = "action-container";
         const button = document.createElement("button");
         const savedTime = getStoredTime(value);
+        const isToday = dateKey === getDateKey(new Date());
+        const isPastDate = dateKey < getDateKey(new Date());
         button.className = `record-action${savedTime ? " is-recorded" : ""}`;
         button.type = "button";
-        button.disabled = Boolean(savedTime) || !storageAvailable || dateKey !== getDateKey(new Date());
+        button.disabled = Boolean(savedTime) || !storageAvailable || (!isToday && !isPastDate);
         button.setAttribute("aria-label", savedTime
           ? `${label} مسجل الساعة ${timeFormatter.format(savedTime)}`
-          : `تسجيل ${label}`);
+          : isToday
+            ? `تسجيل ${label}`
+            : `إضافة ${label} ليوم ${dateFormatter.format(new Date(`${dateKey}T00:00:00`))}`);
 
         const checkbox = document.createElement("span");
         checkbox.className = "checkbox-mark";
@@ -175,9 +186,11 @@
         time.className = "action-time";
         time.textContent = savedTime
           ? timeFormatter.format(savedTime)
-          : dateKey === getDateKey(new Date())
+          : isToday
             ? "اضغط للتسجيل"
-            : "—";
+            : isPastDate
+              ? "إضافة وقت"
+              : "—";
         copy.append(title, time);
         button.append(checkbox, copy);
         container.append(button);
@@ -200,7 +213,19 @@
           container.append(correctionButton);
         }
 
-        button.addEventListener("click", () => recordTime(dateKey, type, label));
+        button.addEventListener("click", () => {
+          if (isToday) {
+            recordTime(dateKey, type, label);
+            return;
+          }
+
+          button.disabled = true;
+          container.append(
+            makeCorrectionEditor(dateKey, type, label, null, () => {
+              button.disabled = false;
+            }),
+          );
+        });
         return container;
       }
 
