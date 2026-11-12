@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f7fb" />
     <title>سجل الحضور والانصراف</title>
-    <link rel="stylesheet" href="attendance.css?v=daily-total" />
+    <link rel="stylesheet" href="attendance.css?v=weekly-total" />
   </head>
   <body>
     <main class="page">
@@ -37,6 +37,11 @@
 
         <p class="storage-notice" id="storage-notice" role="status" hidden></p>
         <div class="days-list" id="days-list"></div>
+        <div class="weekly-total" role="group" aria-label="إجمالي عدد الساعات لهذا الأسبوع">
+          <span class="weekly-total-label">إجمالي عدد الساعات</span>
+          <strong class="weekly-total-value" id="weekly-total-value">٠ س ٠ د</strong>
+          <span class="weekly-total-note">مجموع الأيام المكتملة في هذا الأسبوع</span>
+        </div>
         <p class="privacy-note">
           <span aria-hidden="true">🔒</span>
           سجلاتك محفوظة على هذا الهاتف فقط.
@@ -159,10 +164,10 @@
       function getDailyTotal(dayRecord) {
         const checkIn = getStoredTime(dayRecord.checkIn);
         const checkOut = getStoredTime(dayRecord.checkOut);
-        if (!checkIn || !checkOut) return { text: "—", isInvalid: false };
+        if (!checkIn || !checkOut) return { text: "—", isInvalid: false, minutes: null };
 
         const totalMinutes = Math.floor((checkOut.getTime() - checkIn.getTime()) / 60000);
-        if (totalMinutes < 0) return { text: "راجع الوقت", isInvalid: true };
+        if (totalMinutes < 0) return { text: "راجع الوقت", isInvalid: true, minutes: null };
 
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -170,6 +175,7 @@
         return {
           text: `${numberFormatter.format(hours)} س ${numberFormatter.format(minutes)} د`,
           isInvalid: false,
+          minutes: totalMinutes,
         };
       }
       function makeAction(dateKey, type, label, value) {
@@ -278,6 +284,7 @@
           new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 5),
         )}`;
         daysList.replaceChildren();
+        let weeklyTotalMinutes = 0;
 
         workDays.forEach((day, index) => {
           const date = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + index);
@@ -308,6 +315,7 @@
             makeAction(dateKey, "checkOut", "الانصراف", dayRecord.checkOut),
           );
           const dailyTotal = getDailyTotal(dayRecord);
+          if (dailyTotal.minutes !== null) weeklyTotalMinutes += dailyTotal.minutes;
           const total = document.createElement("div");
           total.className = `day-total${dailyTotal.isInvalid ? " is-invalid" : ""}`;
           total.setAttribute("role", "group");
@@ -323,6 +331,11 @@
           card.append(dayInfo, actions, total);
           daysList.append(card);
         });
+
+        const hours = Math.floor(weeklyTotalMinutes / 60);
+        const minutes = weeklyTotalMinutes % 60;
+        const numberFormatter = new Intl.NumberFormat("ar-EG");
+        document.querySelector("#weekly-total-value").textContent = `${numberFormatter.format(hours)} س ${numberFormatter.format(minutes)} د`;
       }
 
       document.querySelector("#previous-week").addEventListener("click", () => {
