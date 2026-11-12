@@ -13,7 +13,7 @@ Looking for a simple way to record your check-in and check-out times from your p
 - An Arabic interface designed for mobile screens.
 - Check-in and check-out tracking for workdays from Saturday through Thursday.
 - A confirmation step to prevent accidental entries.
-- The ability to correct a recorded time.
+- The ability to add or correct attendance times for previous workdays at any time.
 - The option to browse previous and upcoming weeks and review your records.
 
 ## How to use it
