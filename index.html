@@ -156,6 +156,22 @@
         return editor;
       }
 
+      function getDailyTotal(dayRecord) {
+        const checkIn = getStoredTime(dayRecord.checkIn);
+        const checkOut = getStoredTime(dayRecord.checkOut);
+        if (!checkIn || !checkOut) return { text: "—", isInvalid: false };
+
+        const totalMinutes = Math.floor((checkOut.getTime() - checkIn.getTime()) / 60000);
+        if (totalMinutes < 0) return { text: "راجع الوقت", isInvalid: true };
+
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        const numberFormatter = new Intl.NumberFormat("ar-EG");
+        return {
+          text: `${numberFormatter.format(hours)} س ${numberFormatter.format(minutes)} د`,
+          isInvalid: false,
+        };
+      }
       function makeAction(dateKey, type, label, value) {
         const container = document.createElement("div");
         container.className = "action-container";
@@ -291,7 +307,20 @@
             makeAction(dateKey, "checkIn", "الحضور", dayRecord.checkIn),
             makeAction(dateKey, "checkOut", "الانصراف", dayRecord.checkOut),
           );
-          card.append(dayInfo, actions);
+          const dailyTotal = getDailyTotal(dayRecord);
+          const total = document.createElement("div");
+          total.className = `day-total${dailyTotal.isInvalid ? " is-invalid" : ""}`;
+          total.setAttribute("role", "group");
+          total.setAttribute("aria-label", `إجمالي وقت عمل ${day.name}`);
+          const totalLabel = document.createElement("span");
+          totalLabel.className = "day-total-label";
+          totalLabel.textContent = "إجمالي الوقت";
+          const totalValue = document.createElement("span");
+          totalValue.className = "day-total-value";
+          totalValue.textContent = dailyTotal.text;
+          total.append(totalLabel, totalValue);
+
+          card.append(dayInfo, actions, total);
           daysList.append(card);
         });
       }
