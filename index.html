@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f4f7fb" />
     <title>سجل الحضور والانصراف</title>
-    <link rel="stylesheet" href="attendance.css?v=weekly-total" />
+    <link rel="stylesheet" href="attendance.css?v=salary-total" />
   </head>
   <body>
     <main class="page">
@@ -42,7 +42,27 @@
           <strong class="weekly-total-value" id="weekly-total-value">٠ س ٠ د</strong>
           <span class="weekly-total-note">مجموع الأيام المكتملة في هذا الأسبوع</span>
         </div>
-        <p class="privacy-note">
+        <section class="salary-panel" aria-label="حساب المرتب الأسبوعي">
+          <label class="hourly-rate-card" for="hourly-rate-input">
+            <span class="hourly-rate-label">سعر الساعة</span>
+            <input
+              class="hourly-rate-input"
+              id="hourly-rate-input"
+              type="number"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              placeholder="أدخل سعر الساعة"
+              aria-describedby="hourly-rate-note"
+            />
+            <span class="hourly-rate-note" id="hourly-rate-note">اكتب السعر، وسيُحسب المرتب بنفس العملة.</span>
+          </label>
+          <div class="salary-total-card" role="group" aria-label="إجمالي المرتب لهذا الأسبوع">
+            <span class="salary-total-label">إجمالي المرتب</span>
+            <strong class="salary-total-value" id="salary-total-value">أدخل سعر الساعة</strong>
+            <span class="salary-total-note">إجمالي ساعات الأسبوع × سعر الساعة</span>
+          </div>
+        </section>        <p class="privacy-note">
           <span aria-hidden="true">🔒</span>
           سجلاتك محفوظة على هذا الهاتف فقط.
         </p>
@@ -51,6 +71,7 @@
 
     <script>
       const STORAGE_KEY = "work-attendance-records-v1";
+      const HOURLY_RATE_KEY = "work-attendance-hourly-rate-v1";
       const workDays = [
         { name: "السبت", shortDate: "سبت" },
         { name: "الأحد", shortDate: "أحد" },
@@ -72,10 +93,13 @@
       const daysList = document.querySelector("#days-list");
       const weekRange = document.querySelector("#week-range");
       const weekTitle = document.querySelector("#week-title");
-      const storageNotice = document.querySelector("#storage-notice");
+      const storageNotice = document.querySelector(#storage-notice);
+      const hourlyRateInput = document.querySelector(#hourly-rate-input);
+      const salaryTotalValue = document.querySelector(#salary-total-value);
       let weekStart = getWeekStart(new Date());
       let records = {};
       let storageAvailable = true;
+      let weeklyTotalMinutes = 0;
 
       function getDateKey(date) {
         const year = date.getFullYear();
@@ -108,6 +132,59 @@
         }
       }
 
+      function loadHourlyRate() {
+        try {
+          const savedRate = localStorage.getItem(HOURLY_RATE_KEY);
+          if (savedRate === null) return;
+
+          const rate = Number(savedRate);
+          if (!Number.isFinite(rate) || rate < 0) {
+            throw new Error("Invalid hourly rate");
+          }
+          hourlyRateInput.value = String(rate);
+        } catch (error) {
+          showStorageError("تعذر تحميل سعر الساعة المحفوظ. لن تتمكن من حفظ تغييرات جديدة على هذا الجهاز.");
+        }
+      }
+
+      function updateSalaryTotal() {
+        const rateText = hourlyRateInput.value.trim();
+        if (!rateText) {
+          salaryTotalValue.textContent = "أدخل سعر الساعة";
+          return;
+        }
+
+        const rate = Number(rateText);
+        if (!Number.isFinite(rate) || rate < 0) {
+          salaryTotalValue.textContent = "أدخل سعرًا صحيحًا";
+          return;
+        }
+
+        const amount = (weeklyTotalMinutes / 60) * rate;
+        salaryTotalValue.textContent = new Intl.NumberFormat("ar-EG", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount);
+      }
+
+      function saveHourlyRate() {
+        if (!storageAvailable) return;
+        const rateText = hourlyRateInput.value.trim();
+
+        try {
+          if (!rateText) {
+            localStorage.removeItem(HOURLY_RATE_KEY);
+          } else {
+            if (!hourlyRateInput.reportValidity()) return;
+            const rate = Number(rateText);
+            if (!Number.isFinite(rate) || rate < 0) return;
+            localStorage.setItem(HOURLY_RATE_KEY, String(rate));
+          }
+          updateSalaryTotal();
+        } catch (error) {
+          showStorageError("تعذر حفظ سعر الساعة. تحقق من مساحة التخزين في المتصفح وحاول مرة أخرى.");
+        }
+      }
       function getStoredTime(value) {
         if (typeof value !== "string") return null;
         const date = new Date(value);
@@ -284,7 +361,7 @@
           new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 5),
         )}`;
         daysList.replaceChildren();
-        let weeklyTotalMinutes = 0;
+        weeklyTotalMinutes = 0;
 
         workDays.forEach((day, index) => {
           const date = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + index);
@@ -336,6 +413,7 @@
         const minutes = weeklyTotalMinutes % 60;
         const numberFormatter = new Intl.NumberFormat("ar-EG");
         document.querySelector("#weekly-total-value").textContent = `${numberFormatter.format(hours)} س ${numberFormatter.format(minutes)} د`;
+        updateSalaryTotal();
       }
 
       document.querySelector("#previous-week").addEventListener("click", () => {
@@ -348,6 +426,9 @@
       });
 
       loadRecords();
+      loadHourlyRate();
+      hourlyRateInput.addEventListener("input", updateSalaryTotal);
+      hourlyRateInput.addEventListener("change", saveHourlyRate);
       renderWeek();
     </script>
   </body>
