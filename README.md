@@ -16,6 +16,7 @@ Looking for a simple way to record your check-in and check-out times from your p
 - The ability to add or correct attendance times for previous workdays at any time.
 - Daily work duration calculated automatically from check-in and check-out times.
 - A weekly total that adds up completed daily work durations.
+- An editable hourly rate and an automatic weekly salary estimate based on logged hours.
 - The option to browse previous and upcoming weeks and review your records.
 
 ## How to use it
