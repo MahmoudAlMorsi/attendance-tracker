@@ -28,7 +28,7 @@ Looking for a simple way to record your check-in and check-out times from your p
 
 ## Privacy note
 
-Your records are saved in the browser on the device you use. They are not automatically synced across your devices, and you may lose them if you clear your browser data.
+Your records and hourly rate are saved in the browser on the device you use. They are not automatically synced across your devices, and you may lose them if you clear your browser data.
 
 ## Technologies
 
