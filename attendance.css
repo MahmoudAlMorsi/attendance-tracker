@@ -228,6 +228,72 @@ h1 {
   font-size: 10px;
 }
 
+.salary-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.hourly-rate-card,
+.salary-total-card {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 12px 10px;
+  text-align: center;
+  background: #f6f8fb;
+  border: 1px solid #edf0f5;
+  border-radius: 15px;
+}
+
+.hourly-rate-label,
+.salary-total-label {
+  color: #356c5a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hourly-rate-input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  color: #172b4d;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #dce4ee;
+  border-radius: 10px;
+}
+
+.hourly-rate-input:focus {
+  outline: 2px solid #b7dece;
+  border-color: #247b62;
+}
+
+.hourly-rate-note,
+.salary-total-note {
+  color: #718198;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.salary-total-card {
+  background: #eff8f4;
+  border-color: #dcefe5;
+}
+
+.salary-total-value {
+  color: #247b62;
+  font-size: clamp(17px, 5vw, 22px);
+  font-weight: 800;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
 .day-total {
   display: grid;
   min-width: 0;
@@ -437,6 +503,10 @@ h1 {
     grid-template-columns: 58px minmax(0, 1fr) 58px;
     gap: 6px;
     padding: 10px 7px;
+  }
+
+  .salary-panel {
+    grid-template-columns: 1fr;
   }
 
   .day-actions {
